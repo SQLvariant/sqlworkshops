@@ -1,6 +1,6 @@
 ![](../graphics/microsoftlogo.png)
 
-# Workshop: Microsoft SQL Server big data clusters Architecture (CTP 2.3)
+# Workshop: Microsoft SQL Server big data clusters Architecture (CTP 3.1)
 
 #### <i>A Microsoft Course from the SQL Server team</i>
 
@@ -141,8 +141,9 @@ Using the following steps, you will create a Resource Group in Azure that will h
 <p><b>Steps</b></p>
 
 <p><img style="float: left; margin:Docker Guide 0px 15px 15px 0px;" src="../graphics/checkbox.png"> <a href="https://github.com/Microsoft/sqlworkshops/blob/master/sqlserver2019bigdataclusters/SQL2019BDC/00%20-%20Prerequisites.md" target="_blank"> Ensure that you have completed all prerequisites</a>.</p>
+<p><img style="float: left; margin: 0px 15px 15px 0px;" src="../graphics/checkbox.png"> <a href="https://docs.microsoft.com/en-us/sql/big-data-cluster/deploy-big-data-tools?view=sqlallproducts-allversions" target="_blank"> Read the following article to install the big data cluster Tools, ensuring that you carefully follow each step</a>.</p>
 <p><img style="float: left; margin: 0px 15px 15px 0px;" src="../graphics/checkbox.png"> Open a Command Prompt on your classroom system. <a href="https://docs.microsoft.com/en-us/sql/big-data-cluster/deployment-guidance?view=sqlallproducts-allversions#env" target="_blank"> Read the following article, and use the SET command for the environment variables as instructed in class.</p>
-<p><img style="float: left; margin: 0px 15px 15px 0px;" src="../graphics/checkbox.png"> <a href="https://docs.microsoft.com/en-us/sql/big-data-cluster/quickstart-big-data-cluster-deploy?view=sqlallproducts-allversions" target="_blank"> Read the following article, ensuring that you carefully follow each step</a>. Stop at the section marked <b>Connect to the cluster</b>.</p>
+<p><img style="float: left; margin: 0px 15px 15px 0px;" src="../graphics/checkbox.png"> <a href="https://docs.microsoft.com/en-us/sql/big-data-cluster/quickstart-big-data-cluster-deploy?view=sqlallproducts-allversions" target="_blank"> Read the following article to deploy the bdc to AKS, ensuring that you carefully follow each step</a>. Stop at the section marked <b>Connect to the cluster</b>.</p>
  
 <p style="border-bottom: 1px solid lightgrey;"></p>
 
@@ -174,7 +175,7 @@ In general, Linux treats almost everything as a file system or a process. For ge
     <li><a href="https://www.tecmint.com/fdisk-commands-to-manage-linux-disk-partitions/" target="_blank">Working with the fdisk utility</a></li>
 </ul>
 
-<h3>Processing</h3>
+<h3>Processor</h3>
 
 Both Windows and Linux (in the x86 architecture) are Symmetric Multiprocessing systems, which means that all processors are addressed as a single unit. In general, distributed processing systems should have larger, and more, processors at the "head" node. General Purpose (GP) processors are normally used in these systems, but for certain uses such as Deep Learning or Artificial Intelligence, Purpose-Built processors such as Graphics Processing Unit (GPU's) are used within the environment, and in some cases,  Advanced RISC Machines (ARM) chips can be brought into play for specific tasks. For the purposes of this workshop, you will not need these latter two technologies, although both Windows and Linux support them.
 
@@ -324,7 +325,6 @@ For Big Data systems, having lots of Containers is very advantageous to segment 
 <br>
 
 You can <a href="https://kubernetes.io/docs/tutorials/kubernetes-basics/" target="_blank">learn much more about Kubernetes here</a>. We're using the Azure Kubernetes Service (AKS) in this workshop, and <a href="https://aksworkshop.io/" target="_blank">they have a great tutorial here</a>.
-
 
 In SQL Server big data clusters, Kubernetes is responsible for the state of the SQL Server big data clusters; Kubernetes builds and configures the cluster nodes, assigns pods to nodes, and monitors the health of the cluster.
 

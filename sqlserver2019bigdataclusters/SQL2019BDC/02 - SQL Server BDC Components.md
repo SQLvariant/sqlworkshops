@@ -1,6 +1,6 @@
 ![](../graphics/microsoftlogo.png)
 
-# Workshop: Microsoft SQL Server big data clusters Architecture (CTP 2.3)
+# Workshop: Microsoft SQL Server big data clusters Architecture (CTP 3.1)
 
 #### <i>A Microsoft Course from the SQL Server team</i>
 
@@ -18,7 +18,7 @@ You'll cover the following topics in this Module:
 
   <dt><a href="#2-0">2.0 SQL Server Big Data Capabilities</a></dt>
   <dt><a href="#2-1">2.1 Data Virtualization</a></dt>
-  <dt><a href="#2-2">2.2 SQL Server 2019 big data cluster Components - Data Virtualization, Data Marts and Data Lakes</a></dt>
+  <dt><a href="#2-2">2.2 SQL Server 2019 big data cluster Components - Data Virtualization, Distributed Data and Data Lakes</a></dt>
 
 </dl>
 
@@ -29,7 +29,7 @@ You'll cover the following topics in this Module:
 SQL Server (starting with version 2019) provides three ways to work with large sets of data:
 
  - **Data Virtualization**: Query multiple sources of data technologies using the Polybase SQL Server feature <i>(data left at source)</i>
- - **Storage Pools**: Create sets of disparate data sources that can be queried as a single "Data Mart" <i>(data ingested into sharded databases using PolyBase)</i>
+ - **Storage Pools**: Create sets of disparate data sources that can be queried from Distributed Data sets <i>(data ingested into sharded databases using PolyBase)</i>
  - **SQL Server big data cluster**: Create, manage and control clusters of SQL Server Instances that co-exist in a Kubernetes cluster with Apache Spark and other technologies to access and process large sets of data <i>(Data left in place, ingested through PolyBase, and into/through HDFS)</i> 
 
 Each of these functions are available separately based on the requirements of your solution. You'll cover each of these components in the sections that follow, and learn more about how each is used within the SQL Server big data cluster (BDC).
@@ -91,8 +91,8 @@ As you saw in the <i>Big Data Landscape</i> Module of this workshop, there are m
   <tr><td><b><a href="https://knox.apache.org/" target="_blank">Apache Knox</a></b></td><td>The Apache Knox Gateway is an Application Gateway for interacting with the REST APIs and UIs of the cluster. The Knox Gateway provides a single access point for all REST interactions in BDC's.</td></tr>
   <tr><td style="background-color: Cornsilk; color: black; padding: 5px 5px;"><b><a href="https://livy.incubator.apache.org/" target="_blank">Apache Livy</a></b></td><td style="background-color: Cornsilk; color: black; padding: 5px 5px0;">Apache Livy is used to submit Jobs to Apache Spark.</td></tr>
   <tr><td><b><a href="https://hive.apache.org/" target="_blank">Apache HIVE</a></b></td><td> A distributed storage database used for Spark meta-data.</td></tr>
-  <tr><td style="background-color: Cornsilk; color: black; padding: 5px 5px;"><b><a href="https://grafana.com/" target="_blank">Grafana</a></b></td><td style="background-color: Cornsilk; color: black; padding: 5px 5px;">Visualization and dashboard system used by the SQL Cluster Administration Portal.</td></tr>
-  <tr><td><b><a href="https://www.elastic.co/products/kibana" target="_blank">Kibana</a></b></td><td>Kibana is an open source log visualization and search plugin used by the SQL Cluster Administration Portal.</td></tr>
+  <tr><td style="background-color: Cornsilk; color: black; padding: 5px 5px;"><b><a href="https://grafana.com/" target="_blank">Grafana</a></b></td><td style="background-color: Cornsilk; color: black; padding: 5px 5px;">Visualization and metrics dashboard system.</td></tr>
+  <tr><td><b><a href="https://www.elastic.co/products/kibana" target="_blank">Kibana</a></b></td><td>Kibana is an open source log visualization and search plugin.</td></tr>
 
 </table>
 
@@ -111,7 +111,7 @@ The controller service provides the following core functionality:
  - Manage the workflow of upgrades so that they are implemented safely
  - Manage high availability and DR for statefull services in the cluster
 
-You have two ways of working with the Controller service: the mssqlctl utility, and the <i>Cluster Adminnstration Portal</i>. All communication to the controller service is conducted via a REST API over HTTPS. A self-signed certificate will be automatically generated for you at bootstrap time. Authentication to the controller service endpoint is based on username and password. These credentials are provisioned at cluster bootstrap time using the input for environment variables <i>CONTROLLER_USERNAME</i> and <i>CONTROLLER_PASSWORD</i>.
+You have two ways of working with the Controller service: the mssqlctl utility, and the <i>Azure Data Studio</i> tool. All communication to the controller service is conducted via a REST API over HTTPS. A self-signed certificate will be automatically generated for you at bootstrap time. Authentication to the controller service endpoint is based on username and password. These credentials are provisioned at cluster bootstrap time using the input for environment variables <i>CONTROLLER_USERNAME</i> and <i>CONTROLLER_PASSWORD</i>.
 
 These components are used in the Controller of the SQL Server big data cluster:
 
@@ -121,7 +121,7 @@ These components are used in the Controller of the SQL Server big data cluster:
 
 </table>
 
-<h3>Control Plane: SQL Server Master Instance</h3>
+<h3>BDC: SQL Server Master Instance</h3>
 
 The SQL Server Master Instance is an installation of SQL Server 2019 in a Pod on a Node in the Kubernetes cluster. You access it the same way as any SQL Server Instance, and use it for high-value, OLTP, OLAP or other types of workloads. It has Machine Learning Services already configured, so you have the full range of R, Python, and Java to work with on the data in the Cluster environment. 
 
@@ -133,7 +133,7 @@ The Master Instance stores meta-data which is outside the scope of the meta-data
 - PolyBase external data sources and external tables defined in user databases.
 
 
-These components are used in the Controller of the SQL Server Master Instance:
+These components are used in the SQL Server Master Instance:
 
 <table style="tr:nth-child(even) {background-color: #f2f2f2;}; text-align: left; display: table; border-collapse: collapse; border-spacing: 5px; border-color: gray;">
 
@@ -143,7 +143,7 @@ These components are used in the Controller of the SQL Server Master Instance:
 </table>
 
 
-<h3>Compute Plane: Compute Pool</h3>
+<h3>BDC: Compute Pool</h3>
 
 The Compute Pool holds one or more SQL Server Pods used for distributed processing under the direction of the SQL Server Master Instance. It makes the calls out to the PolyBase connectors for a distributed Compute layer of the BDC.
 
@@ -155,7 +155,7 @@ These components are used in the Compute Pool of the SQL Server big data cluster
 
 </table>
 
-<h3>Compute Plane: App Pool</h3>
+<h3>BDC: App Pool</h3>
 
 The App Pool is a set of Pods within a Node that hold multiple types of end-points into the system. SQL Server Integration Services lives in the App Pool, and other Job systems are possible. You could instatiate a long-running job (such as IoT streaming) or Machine Learning (ML) endpoints used for scoring a prediction or returning a classification.  
 
@@ -167,9 +167,9 @@ These components are used in the Compute Pool of the SQL Server big data cluster
 
 </table>
 
-<h3>Data Plane: Data Pool</h3>
+<h3>BDC: Data Pool</h3>
 
-The Data Pool in a SQL Server big data cluster consists of one or more SQL Server data pool instances. SQL data pool instances provide persistent SQL Server storage for the cluster. A data pool is used to ingest data from SQL queries or Spark jobs. To provide better performance across large data sets, data in a data pool is distributed into shards across the member SQL data pool instances.
+The Data Pool in a SQL Server big data cluster consists of one or more SQL Server data pool instances. SQL data pool instances provide persistent SQL Server storage for the cluster. A data pool is used to ingest data from SQL queries or Spark jobs, or other locations. To provide better performance across large data sets, data in a data pool is distributed into shards across the member SQL data pool instances.
 
 <br>
 <img style="height: 200; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);" src="../graphics/datamart1.png">
@@ -184,7 +184,7 @@ These components are used in the Data Pool of the SQL Server big data cluster:
 
 </table>
 
-<h3>Data Plane: Storage Pool</h3>
+<h3>BDC: Storage Pool</h3>
 
 The storage pool consists of storage nodes comprised of SQL Server on Linux, Spark, and HDFS. All the storage nodes in a SQL big data cluster are members of an HDFS cluster. You can use these as a "Data Lake" construct to work with large sets of data stored on disparate data sources. 
 
@@ -198,7 +198,7 @@ These components are used in the Storage Pool of the SQL Server big data cluster
 
 <table style="tr:nth-child(even) {background-color: #f2f2f2;}; text-align: left; display: table; border-collapse: collapse; border-spacing: 5px; border-color: gray;">
 
-  <tr><td style="background-color: Cornsilk; color: black; padding: 5px 5px;"><b><a href="https://kubernetes.io/docs/concepts/overview/components/" target="_blank">HDFS</a></b></td><td style="background-color: Cornsilk; color: black; padding: 5px 5px;">The distributed data storage system used by SQL Server and Apache Spark.</td></tr>
+  <tr><td style="background-color: Cornsilk; color: black; padding: 5px 5px;"><b><a href="https://www.hdfstutorial.com/hdfs-tutorial-guide/" target="_blank">HDFS</a></b></td><td style="background-color: Cornsilk; color: black; padding: 5px 5px;">The distributed data storage system used by SQL Server and Apache Spark.</td></tr>
   <tr><td><b><a href="https://spark.apache.org/" target="_blank">Apache Spark</a></b></td><td>Apache Spark is an analytics engine for processing large-scale data. It can be used with data stored in HDFS, and has connectors to work with data in SQL Server as well.</td></tr>
 
 </table>
@@ -209,7 +209,7 @@ These components are used in the Storage Pool of the SQL Server big data cluster
 In this section you will review the solution tutorial you will perform in the <i>04 Operationalization</i> Module. You'll see how to load data into the Data Pool.
 
 <br>
-<p><img style="float: left; margin: 0px 15px 15px 0px;" src="../graphics/checkbox.png">Open <a href="https://docs.microsoft.com/en-us/sql/big-data-cluster/tutorial-data-pool-ingest-sql?view=sqlallproducts-allversions" target="_blank">this reference and review the steps in the tutorial</a>. This explains the two steps required to create and load an External table in the Data Pool. </p>
+<p><img style="float: left; margin: 0px 15px 15px 0px;" src="../graphics/checkbox.png">Open <a href="https://docs.microsoft.com/en-us/sql/big-data-cluster/tutorial-data-pool-ingest-sql?view=sqlallproducts-allversions" target="_blank">this reference and review the steps in the tutorial</a>. This explains the two steps required to create and load an External table in the Data Pool. You'll perform these steps in the <i>Operationalization</i> Module later.</p>
 
 <br>
 <p style="border-bottom: 1px solid lightgrey;"></p>
